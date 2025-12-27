@@ -1,16 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { KanbanBoard } from "@/components/kanban-board"
-import { EquipmentList } from "@/components/equipment-list"
-import { CalendarView } from "@/components/calendar-view"
-import { WorkCenterList } from "@/components/work-center-list"
-import { Button } from "@/components/ui/button"
-import { Wrench, LogOut } from "lucide-react"
-import { useRequests } from "@/lib/hooks/use-requests"
-
 export default function HomePage() {
   const router = useRouter()
   const [activeTab, setActiveTab] = useState("kanban")
