@@ -128,4 +128,3 @@ This application is self-hostable and requires:
 - MySQL
 - Tailwind CSS
 - shadcn/ui components
-```
