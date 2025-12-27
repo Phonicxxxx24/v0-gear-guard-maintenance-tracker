@@ -20,6 +20,15 @@ A full-stack Next.js application for managing equipment maintenance requests wit
 - Node.js 18+ 
 - MySQL database
 
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Demo Credentials
