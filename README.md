@@ -20,28 +20,6 @@ A full-stack Next.js application for managing equipment maintenance requests wit
 - Node.js 18+ 
 - MySQL database
 
-### 2. Setup Environment Variables
-
-Create a `.env` file in the root directory:
-
-```env
-DATABASE_URL="mysql://user:password@localhost:3306/gearguard"
-```
-
-Replace with your MySQL connection string.
-
-### 3. Setup Database
-
-```bash
-# Generate Prisma Client
-npx prisma generate
-
-# Run migrations
-npx prisma migrate dev
-
-# Seed the database
-npx prisma db seed
-```
 
 ### 4. Run Development Server
 
