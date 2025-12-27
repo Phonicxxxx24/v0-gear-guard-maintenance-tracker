@@ -50,6 +50,13 @@ npx prisma migrate dev
 # Seed the database
 npx prisma db seed
 ```
+
+### 4. Run Development Server
+
+```bash
+npm run dev
+```
+
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Demo Credentials
