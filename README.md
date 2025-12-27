@@ -20,13 +20,6 @@ A full-stack Next.js application for managing equipment maintenance requests wit
 - Node.js 18+ 
 - MySQL database
 
-
-### 4. Run Development Server
-
-```bash
-npm run dev
-```
-
 Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Demo Credentials
