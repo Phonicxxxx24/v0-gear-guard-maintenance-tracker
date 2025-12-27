@@ -1,0 +1,168 @@
+// Prisma schema for GearGuard Maintenance Tracker
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model MaintenanceTeam {
+  id            Int       @id @default(autoincrement())
+  name          String    @db.VarChar(100)
+  description   String?   @db.Text
+  membersCount  Int       @default(0) @map("members_count")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  employees            Employee[]           @relation("TeamMembers")
+  equipmentCategories  EquipmentCategory[]
+  equipment            Equipment[]
+  maintenanceRequests  MaintenanceRequest[]
+
+  @@map("maintenance_teams")
+}
+
+model Department {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+  code String @unique @db.VarChar(20)
+
+  // Relations
+  employees           Employee[]
+  equipment           Equipment[]
+  maintenanceRequests MaintenanceRequest[]
+
+  @@map("departments")
+}
+
+model Employee {
+  id              Int     @id @default(autoincrement())
+  name            String  @db.VarChar(100)
+  email           String  @unique @db.VarChar(255)
+  password        String  @db.VarChar(255) // hashed password
+  departmentId    Int     @map("department_id")
+  role            String  @default("User") @db.VarChar(50) // Manager | Technician | User
+  defaultTeamId   Int?    @map("default_team_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  department          Department            @relation(fields: [departmentId], references: [id])
+  defaultTeam         MaintenanceTeam?      @relation("TeamMembers", fields: [defaultTeamId], references: [id])
+  equipment           Equipment[]           @relation("EquipmentOwner")
+  defaultTechnician   Equipment[]           @relation("DefaultTechnician")
+  maintenanceRequests MaintenanceRequest[]  @relation("RequestRaisedBy")
+  assignedRequests    MaintenanceRequest[]  @relation("AssignedTechnician")
+
+  @@index([departmentId])
+  @@index([defaultTeamId])
+  @@map("employees")
+}
+
+model EquipmentCategory {
+  id                 Int     @id @default(autoincrement())
+  name               String  @db.VarChar(100)
+  responsibleTeamId  Int     @map("responsible_team_id")
+  companyName        String? @db.VarChar(100) @map("company_name")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  responsibleTeam     MaintenanceTeam       @relation(fields: [responsibleTeamId], references: [id])
+  equipment           Equipment[]
+  maintenanceRequests MaintenanceRequest[]
+
+  @@index([responsibleTeamId])
+  @@map("equipment_categories")
+}
+
+model Equipment {
+  id                   Int       @id @default(autoincrement())
+  name                 String    @db.VarChar(200)
+  serialNumber         String    @unique @db.VarChar(100) @map("serial_number")
+  categoryId           Int       @map("category_id")
+  departmentId         Int       @map("department_id")
+  employeeId           Int       @map("employee_id") // By Employee tracking
+  location             String?   @db.VarChar(200)
+  purchaseDate         DateTime? @map("purchase_date")
+  warrantyEnd          DateTime? @map("warranty_end")
+  workCenterId         Int?      @map("work_center_id")
+  maintenanceTeamId    Int       @map("maintenance_team_id")
+  defaultTechnicianId  Int       @map("default_technician_id")
+  state                String    @default("Active") @db.VarChar(20) // Active | Scrap
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  category            EquipmentCategory     @relation(fields: [categoryId], references: [id])
+  department          Department            @relation(fields: [departmentId], references: [id])
+  employee            Employee              @relation("EquipmentOwner", fields: [employeeId], references: [id])
+  maintenanceTeam     MaintenanceTeam       @relation(fields: [maintenanceTeamId], references: [id])
+  defaultTechnician   Employee              @relation("DefaultTechnician", fields: [defaultTechnicianId], references: [id])
+  workCenter          WorkCenter?           @relation(fields: [workCenterId], references: [id])
+  maintenanceRequests MaintenanceRequest[]
+
+  @@index([categoryId])
+  @@index([departmentId])
+  @@index([employeeId])
+  @@index([maintenanceTeamId])
+  @@index([defaultTechnicianId])
+  @@index([workCenterId])
+  @@map("equipment")
+}
+
+model MaintenanceRequest {
+  id                    Int       @id @default(autoincrement())
+  requestNumber         String    @unique @db.VarChar(50) @map("request_number") // MR-2025-0001
+  type                  String    @db.VarChar(20) // Corrective | Preventive
+  subject               String    @db.VarChar(255)
+  equipmentId           Int       @map("equipment_id")
+  equipmentCategoryId   Int       @map("equipment_category_id")
+  departmentId          Int       @map("department_id")
+  employeeId            Int       @map("employee_id") // Person who raised it
+  maintenanceTeamId     Int       @map("maintenance_team_id")
+  assignedTechnicianId  Int?      @map("assigned_technician_id")
+  scheduledDate         DateTime? @map("scheduled_date")
+  startDatetime         DateTime? @map("start_datetime")
+  durationHours         Float?    @map("duration_hours")
+  state                 String    @default("New") @db.VarChar(20) // New | In Progress | Repaired | Scrap
+  description           String?   @db.Text
+  createdAt             DateTime  @default(now()) @map("created_at")
+  updatedAt             DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  equipment          Equipment          @relation(fields: [equipmentId], references: [id])
+  equipmentCategory  EquipmentCategory  @relation(fields: [equipmentCategoryId], references: [id])
+  department         Department         @relation(fields: [departmentId], references: [id])
+  employee           Employee           @relation("RequestRaisedBy", fields: [employeeId], references: [id])
+  maintenanceTeam    MaintenanceTeam    @relation(fields: [maintenanceTeamId], references: [id])
+  assignedTechnician Employee?          @relation("AssignedTechnician", fields: [assignedTechnicianId], references: [id])
+
+  @@index([equipmentId])
+  @@index([equipmentCategoryId])
+  @@index([departmentId])
+  @@index([employeeId])
+  @@index([maintenanceTeamId])
+  @@index([assignedTechnicianId])
+  @@index([state])
+  @@index([type])
+  @@map("maintenance_requests")
+}
+
+model WorkCenter {
+  id              Int     @id @default(autoincrement())
+  name            String  @db.VarChar(100)
+  code            String  @unique @db.VarChar(20)
+  costPerHour     Float?  @map("cost_per_hour")
+  capacityPerDay  Int?    @map("capacity_per_day")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  equipment Equipment[]
+
+  @@map("work_centers")
+}

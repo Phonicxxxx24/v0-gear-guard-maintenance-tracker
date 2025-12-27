@@ -4,74 +4,84 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.98 0.002 264.376);
-  --foreground: oklch(0.15 0.01 264.376);
-  --card: oklch(0.99 0.001 264.376);
-  --card-foreground: oklch(0.15 0.01 264.376);
-  --popover: oklch(0.99 0.001 264.376);
-  --popover-foreground: oklch(0.15 0.01 264.376);
-  --primary: oklch(0.488 0.243 264.376);
-  --primary-foreground: oklch(0.985 0.002 264.376);
-  --secondary: oklch(0.94 0.005 264.376);
-  --secondary-foreground: oklch(0.15 0.01 264.376);
-  --muted: oklch(0.95 0.004 264.376);
-  --muted-foreground: oklch(0.556 0.02 264.376);
-  --accent: oklch(0.94 0.005 264.376);
-  --accent-foreground: oklch(0.15 0.01 264.376);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0.002 264.376);
-  --border: oklch(0.88 0.006 264.376);
-  --input: oklch(0.88 0.006 264.376);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0.002 264.376);
-  --sidebar-foreground: oklch(0.15 0.01 264.376);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0.002 264.376);
-  --sidebar-accent: oklch(0.94 0.005 264.376);
-  --sidebar-accent-foreground: oklch(0.15 0.01 264.376);
-  --sidebar-border: oklch(0.88 0.006 264.376);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  /* Updated to Odoo-like enterprise palette */
+  --background: #f5f4f8; /* Soft grey background */
+  --foreground: #1f2933; /* Primary text color */
+  --card: #ffffff; /* White cards */
+  --card-foreground: #1f2933;
+  --popover: #ffffff;
+  --popover-foreground: #1f2933;
+  --primary: #714b67; /* Muted purple primary */
+  --primary-foreground: #ffffff;
+  --secondary: #f0eef4; /* Kanban header background */
+  --secondary-foreground: #1f2933;
+  --muted: #e5e5ec; /* Neutral badge background */
+  --muted-foreground: #4b5563; /* Neutral badge text */
+  --accent: #3b82f6; /* Blue accent for links */
+  --accent-foreground: #ffffff;
+  --destructive: #e03131; /* Overdue badge red */
+  --destructive-foreground: #ffffff;
+  --border: #dddee7; /* Soft border color */
+  --input: #dddee7;
+  --ring: #714b67;
+  --chart-1: #714b67;
+  --chart-2: #3b82f6;
+  --chart-3: #e03131;
+  --chart-4: #10b981;
+  --chart-5: #f59e0b;
+  --radius: 0.5rem;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #1f2933;
+  --sidebar-primary: #714b67;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f0eef4;
+  --sidebar-accent-foreground: #1f2933;
+  --sidebar-border: #dddee7;
+  --sidebar-ring: #714b67;
+
+  /* Add custom enterprise colors */
+  --primary-hover: #5c3c54;
+  --text-secondary: #6b7280;
+  --kanban-header: #f0eef4;
 }
 
 .dark {
-  --background: oklch(0.11 0.01 264.376);
-  --foreground: oklch(0.95 0.005 264.376);
-  --card: oklch(0.13 0.012 264.376);
-  --card-foreground: oklch(0.95 0.005 264.376);
-  --popover: oklch(0.13 0.012 264.376);
-  --popover-foreground: oklch(0.95 0.005 264.376);
-  --primary: oklch(0.696 0.17 264.376);
-  --primary-foreground: oklch(0.11 0.01 264.376);
-  --secondary: oklch(0.2 0.015 264.376);
-  --secondary-foreground: oklch(0.95 0.005 264.376);
-  --muted: oklch(0.18 0.014 264.376);
-  --muted-foreground: oklch(0.65 0.04 264.376);
-  --accent: oklch(0.22 0.018 264.376);
-  --accent-foreground: oklch(0.95 0.005 264.376);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.985 0.002 264.376);
-  --border: oklch(0.22 0.018 264.376);
-  --input: oklch(0.22 0.018 264.376);
-  --ring: oklch(0.696 0.17 264.376);
-  --chart-1: oklch(0.696 0.17 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.11 0.01 264.376);
-  --sidebar-foreground: oklch(0.95 0.005 264.376);
-  --sidebar-primary: oklch(0.696 0.17 264.376);
-  --sidebar-primary-foreground: oklch(0.11 0.01 264.376);
-  --sidebar-accent: oklch(0.2 0.015 264.376);
-  --sidebar-accent-foreground: oklch(0.95 0.005 264.376);
-  --sidebar-border: oklch(0.22 0.018 264.376);
-  --sidebar-ring: oklch(0.696 0.17 264.376);
+  --background: #1a1b1e;
+  --foreground: #e5e5e5;
+  --card: #25262b;
+  --card-foreground: #e5e5e5;
+  --popover: #25262b;
+  --popover-foreground: #e5e5e5;
+  --primary: #9b7b92;
+  --primary-foreground: #ffffff;
+  --secondary: #2c2d31;
+  --secondary-foreground: #e5e5e5;
+  --muted: #373a40;
+  --muted-foreground: #9ca3af;
+  --accent: #5b8def;
+  --accent-foreground: #ffffff;
+  --destructive: #fa5252;
+  --destructive-foreground: #ffffff;
+  --border: #373a40;
+  --input: #373a40;
+  --ring: #9b7b92;
+  --chart-1: #9b7b92;
+  --chart-2: #5b8def;
+  --chart-3: #fa5252;
+  --chart-4: #20c997;
+  --chart-5: #fcc419;
+  --sidebar: #1a1b1e;
+  --sidebar-foreground: #e5e5e5;
+  --sidebar-primary: #9b7b92;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #2c2d31;
+  --sidebar-accent-foreground: #e5e5e5;
+  --sidebar-border: #373a40;
+  --sidebar-ring: #9b7b92;
+
+  --primary-hover: #7d6174;
+  --text-secondary: #9ca3af;
+  --kanban-header: #2c2d31;
 }
 
 @theme inline {
@@ -121,5 +131,10 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* Add custom hover states for primary buttons */
+  .btn-primary:hover {
+    background-color: var(--primary-hover);
   }
 }

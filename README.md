@@ -1,30 +1,128 @@
-# GearGuard maintenance tracker
+# GearGuard - Maintenance Tracker
 
-*Automatically synced with your [v0.app](https://v0.app) deployments*
+A full-stack Next.js application for managing equipment maintenance requests with MySQL database.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/hjain242000-6149s-projects/v0-gear-guard-maintenance-tracker)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/tszje9ecU8O)
+## Features
 
-## Overview
+- User authentication (login/signup)
+- Kanban board for maintenance requests
+- Equipment management
+- Calendar view for preventive maintenance
+- Team-based workflow
+- Real-time updates
+- MySQL database with Prisma ORM
 
-This repository will stay in sync with your deployed chats on [v0.app](https://v0.app).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.app](https://v0.app).
+## Prerequisites
+
+- Node.js 18+ 
+- MySQL database
+
+## Setup Instructions
+
+### 1. Install Dependencies
+
+```bash
+npm install
+```
+
+### 2. Setup Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+DATABASE_URL="mysql://user:password@localhost:3306/gearguard"
+```
+
+Replace with your MySQL connection string.
+
+### 3. Setup Database
+
+```bash
+# Generate Prisma Client
+npx prisma generate
+
+# Run migrations
+npx prisma migrate dev
+
+# Seed the database
+npx prisma db seed
+```
+
+### 4. Run Development Server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Demo Credentials
+
+- Email: `john@example.com`
+- Password: `password123`
+
+## Database Schema
+
+The application uses the following main tables:
+
+- `maintenance_teams` - Teams responsible for maintenance
+- `departments` - Company departments
+- `employees` - Users with authentication
+- `equipment_categories` - Equipment categorization
+- `equipment` - Equipment inventory
+- `maintenance_requests` - Maintenance work orders
+- `work_centers` - Work centers (optional)
+
+## API Endpoints
+
+### Authentication
+- `POST /api/auth/login` - User login
+- `POST /api/auth/signup` - User registration
+- `POST /api/auth/logout` - User logout
+- `GET /api/auth/me` - Get current user
+
+### Equipment
+- `GET /api/equipment` - List equipment
+- `POST /api/equipment` - Create equipment
+- `GET /api/equipment/[id]` - Get equipment details
+- `GET /api/equipment/[id]/open-requests-count` - Count open requests
+
+### Maintenance Requests
+- `GET /api/requests` - List requests
+- `POST /api/requests` - Create request (with auto-fill)
+- `GET /api/requests/kanban` - Get kanban board data
+- `GET /api/requests/calendar` - Get calendar events
+- `PATCH /api/requests/[id]/state` - Update request state
+- `DELETE /api/requests/[id]` - Delete request
+
+### Other
+- `GET /api/teams` - List maintenance teams
+- `GET /api/equipment-categories` - List equipment categories
+- `GET /api/departments` - List departments
+- `GET /api/employees` - List employees
+
+## Auto-fill Logic
+
+When creating a maintenance request by selecting equipment, the system automatically fills:
+- Equipment category
+- Maintenance team
+- Department
+- Responsible employee
 
 ## Deployment
 
-Your project is live at:
+This application is self-hostable and requires:
+- Node.js runtime
+- MySQL database
+- Environment variables configured
 
-**[https://vercel.com/hjain242000-6149s-projects/v0-gear-guard-maintenance-tracker](https://vercel.com/hjain242000-6149s-projects/v0-gear-guard-maintenance-tracker)**
+## Tech Stack
 
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/tszje9ecU8O](https://v0.app/chat/tszje9ecU8O)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+- Next.js 16 (App Router)
+- React 19
+- TypeScript
+- Prisma ORM
+- MySQL
+- Tailwind CSS
+- shadcn/ui components
+```

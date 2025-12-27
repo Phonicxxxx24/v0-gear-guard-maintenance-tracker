@@ -9,30 +9,45 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Plus, Search } from "lucide-react"
 import { EquipmentFormModal } from "@/components/equipment-form-modal"
-import { type Equipment, type MaintenanceRequest, mockEquipment, getTeamColor } from "@/lib/mock-data"
+import type { MaintenanceRequestWithRelations } from "@/lib/types"
+import { useEquipment } from "@/lib/hooks/use-equipment"
 
 interface EquipmentListProps {
-  requests: MaintenanceRequest[]
+  requests: MaintenanceRequestWithRelations[]
+}
+
+function getTeamColor(teamName: string) {
+  if (teamName === "Mechanics") return "bg-blue-500/10 text-blue-500 border-blue-500/20"
+  if (teamName === "Electricians") return "bg-amber-500/10 text-amber-500 border-amber-500/20"
+  if (teamName === "IT") return "bg-purple-500/10 text-purple-500 border-purple-500/20"
+  return "bg-gray-500/10 text-gray-500 border-gray-500/20"
 }
 
 export function EquipmentList({ requests }: EquipmentListProps) {
-  const [equipment] = useState<Equipment[]>(mockEquipment)
+  const { equipment, loading, addEquipment } = useEquipment()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [teamFilter, setTeamFilter] = useState<string>("all")
 
-  const getMaintenanceCount = (equipmentId: string) => {
-    return requests.filter((r) => r.equipmentId === equipmentId && r.status !== "repaired" && r.status !== "scrap")
-      .length
+  const getMaintenanceCount = (equipmentId: number) => {
+    return requests.filter((r) => r.equipmentId === equipmentId && r.state !== "Repaired" && r.state !== "Scrap").length
   }
 
   const filteredEquipment = equipment.filter((item) => {
     const matchesSearch =
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesTeam = teamFilter === "all" || item.team === teamFilter
+    const matchesTeam = teamFilter === "all" || item.maintenanceTeam.name === teamFilter
     return matchesSearch && matchesTeam
   })
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Loading equipment...</p>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -87,7 +102,7 @@ export function EquipmentList({ requests }: EquipmentListProps) {
                     <TableHead>Serial Number</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Team</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Location</TableHead>
                     <TableHead>Maintenance</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -98,27 +113,20 @@ export function EquipmentList({ requests }: EquipmentListProps) {
                       <TableRow key={item.id}>
                         <TableCell className="font-medium">{item.name}</TableCell>
                         <TableCell className="text-muted-foreground">{item.serialNumber}</TableCell>
-                        <TableCell>{item.category}</TableCell>
+                        <TableCell>{item.category.name}</TableCell>
                         <TableCell>
-                          <Badge variant="secondary" className={`${getTeamColor(item.team)} border`}>
-                            {item.team}
+                          <Badge variant="secondary" className={`${getTeamColor(item.maintenanceTeam.name)} border`}>
+                            {item.maintenanceTeam.name}
                           </Badge>
                         </TableCell>
+                        <TableCell className="text-muted-foreground text-sm">{item.location}</TableCell>
                         <TableCell>
-                          <Badge
-                            variant={item.status === "operational" ? "default" : "secondary"}
-                            className={
-                              item.status === "operational" ? "bg-green-500/10 text-green-500 border-green-500/20" : ""
-                            }
-                          >
-                            {item.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          {maintenanceCount > 0 && (
+                          {maintenanceCount > 0 ? (
                             <Badge variant="outline" className="text-primary border-primary/20">
                               {maintenanceCount} open
                             </Badge>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">No open requests</span>
                           )}
                         </TableCell>
                       </TableRow>
@@ -131,7 +139,7 @@ export function EquipmentList({ requests }: EquipmentListProps) {
         </Card>
       </div>
 
-      <EquipmentFormModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <EquipmentFormModal open={isModalOpen} onOpenChange={setIsModalOpen} onAddEquipment={addEquipment} />
     </>
   )
 }

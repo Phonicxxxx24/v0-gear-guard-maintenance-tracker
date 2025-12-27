@@ -1,25 +1,86 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { RequestFormModal } from "@/components/request-form-modal"
-import { type MaintenanceRequest, getTeamColor } from "@/lib/mock-data"
+import type { CalendarEvent } from "@/lib/types"
 
 interface CalendarViewProps {
-  requests: MaintenanceRequest[]
-  onAddRequest: (newRequest: MaintenanceRequest) => void
+  onAddRequest: (requestData: any) => Promise<void>
 }
 
-export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
+function getTeamColor(teamName: string) {
+  if (teamName === "Mechanics") return "bg-blue-500/10 text-blue-500 border-blue-500/20"
+  if (teamName === "Electricians") return "bg-amber-500/10 text-amber-500 border-amber-500/20"
+  if (teamName === "IT Support") return "bg-purple-500/10 text-purple-500 border-purple-500/20"
+  return "bg-gray-500/10 text-gray-500 border-gray-500/20"
+}
+
+const demoCalendarEvents: CalendarEvent[] = [
+  {
+    id: 1,
+    date: new Date(new Date().getFullYear(), new Date().getMonth(), 5).toISOString().split("T")[0],
+    team: "Mechanics",
+    description: "CNC Machine Preventive Maintenance",
+  },
+  {
+    id: 2,
+    date: new Date(new Date().getFullYear(), new Date().getMonth(), 12).toISOString().split("T")[0],
+    team: "Electricians",
+    description: "Power Panel Inspection",
+  },
+  {
+    id: 3,
+    date: new Date(new Date().getFullYear(), new Date().getMonth(), 18).toISOString().split("T")[0],
+    team: "IT Support",
+    description: "Server Backup Verification",
+  },
+  {
+    id: 4,
+    date: new Date(new Date().getFullYear(), new Date().getMonth(), 22).toISOString().split("T")[0],
+    team: "Mechanics",
+    description: "Conveyor Belt Maintenance",
+  },
+  {
+    id: 5,
+    date: new Date(new Date().getFullYear(), new Date().getMonth(), 25).toISOString().split("T")[0],
+    team: "Electricians",
+    description: "Generator Testing",
+  },
+]
+
+export function CalendarView({ onAddRequest }: CalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState<Date | null>(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [events, setEvents] = useState<CalendarEvent[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function fetchCalendarEvents() {
+      try {
+        setLoading(true)
+        const response = await fetch("/api/requests/calendar")
+        if (!response.ok) throw new Error("Failed to fetch calendar events")
+
+        const data = await response.json()
+        setEvents(data)
+        console.log("[v0] Calendar events loaded from API")
+      } catch (error) {
+        console.log("[v0] API not available, using demo calendar events")
+        setEvents(demoCalendarEvents)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCalendarEvents()
+  }, [])
 
   const daysInMonth = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getDate()
-
   const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay()
 
   const monthNames = [
@@ -37,9 +98,9 @@ export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
     "December",
   ]
 
-  const getRequestsForDate = (day: number) => {
+  const getEventsForDate = (day: number) => {
     const dateStr = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`
-    return requests.filter((r) => r.scheduledDate.startsWith(dateStr))
+    return events.filter((e) => e.date === dateStr)
   }
 
   const handlePrevMonth = () => {
@@ -54,6 +115,29 @@ export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
     const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day)
     setSelectedDate(clickedDate)
     setIsModalOpen(true)
+  }
+
+  const handleModalClose = async (open: boolean) => {
+    setIsModalOpen(open)
+    if (!open) {
+      try {
+        const response = await fetch("/api/requests/calendar")
+        if (response.ok) {
+          const data = await response.json()
+          setEvents(data)
+        }
+      } catch (error) {
+        console.log("[v0] Keeping existing calendar data")
+      }
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p className="text-muted-foreground">Loading calendar...</p>
+      </div>
+    )
   }
 
   return (
@@ -94,7 +178,7 @@ export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
               {/* Calendar days */}
               {Array.from({ length: daysInMonth }).map((_, i) => {
                 const day = i + 1
-                const requestsForDay = getRequestsForDate(day)
+                const eventsForDay = getEventsForDate(day)
                 const isToday =
                   day === new Date().getDate() &&
                   currentDate.getMonth() === new Date().getMonth() &&
@@ -115,17 +199,17 @@ export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
                       {day}
                     </span>
                     <div className="flex flex-col gap-1 w-full">
-                      {requestsForDay.slice(0, 2).map((request) => (
+                      {eventsForDay.slice(0, 2).map((event) => (
                         <Badge
-                          key={request.id}
+                          key={event.id}
                           variant="secondary"
-                          className={`${getTeamColor(request.team)} text-xs px-1 py-0 h-4 justify-start truncate w-full`}
+                          className={`${getTeamColor(event.team)} text-xs px-1 py-0 h-4 justify-start truncate w-full`}
                         >
-                          {request.team}
+                          {event.team}
                         </Badge>
                       ))}
-                      {requestsForDay.length > 2 && (
-                        <span className="text-xs text-muted-foreground">+{requestsForDay.length - 2}</span>
+                      {eventsForDay.length > 2 && (
+                        <span className="text-xs text-muted-foreground">+{eventsForDay.length - 2}</span>
                       )}
                     </div>
                   </button>
@@ -138,7 +222,7 @@ export function CalendarView({ requests, onAddRequest }: CalendarViewProps) {
 
       <RequestFormModal
         open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        onOpenChange={handleModalClose}
         defaultDate={selectedDate || undefined}
         onAddRequest={onAddRequest}
       />
